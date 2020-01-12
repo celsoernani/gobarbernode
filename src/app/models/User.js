@@ -1,5 +1,6 @@
-import { Model, Sequelize } from "sequelize";
-import bcrypt from "bcryptjs";
+import { Model, Sequelize } from 'sequelize';
+import bcrypt from 'bcryptjs';
+
 class User extends Model {
   static init(sequelize) {
     super.init(
@@ -8,20 +9,25 @@ class User extends Model {
         email: Sequelize.STRING,
         password: Sequelize.VIRTUAL,
         password_hash: Sequelize.STRING,
-        provider: Sequelize.BOOLEAN
+        provider: Sequelize.BOOLEAN,
+        avatar_id: Sequelize.INTEGER,
       },
       {
-        sequelize
+        sequelize,
       }
     );
-    //parte de codigo que vai ser executado de acordo com o primeiro parametro
+    // parte de codigo que vai ser executado de acordo com o primeiro parametro
 
-    this.addHook("beforeSave", async user => {
+    this.addHook('beforeSave', async user => {
       if (user.password) {
         user.password_hash = await bcrypt.hash(user.password, 8);
       }
     });
     return this;
+  }
+
+  static associate(models) {
+    this.belongsTo(models.File, { foreignKey: 'avatar_id' });
   }
 
   checkPassword(password) {
